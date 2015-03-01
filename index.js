@@ -49,8 +49,58 @@ Not.prototype._transform = function(chunk, encoding, next) {
 };
 
 
+function MultipleInputGate() {
+  Transform.call(this, { objectMode: true });
+
+  this._signalSourceMap = new HashMap();
+
+  var self = this;
+
+  this.on('pipe', function(source) {
+    self._signalSourceMap.set(source, undefined);
+
+    source.on('data', function(chunk) {
+      self._signalSourceMap.set(source, chunk);
+
+      var inputSignals = self._signalSourceMap.values();
+      var isReady = !_.contains(inputSignals, undefined);
+      if (isReady) {
+        self.push(self._calculate(inputSignals));
+      }
+    });
+  });
+
+  this.on('unpipe', function(source) {
+    self._signalSourceMap.remove(source);
+  });
+}
+util.inherits(MultipleInputGate, Transform);
+
+MultipleInputGate.prototype._transform = function() {};
+MultipleInputGate.prototype._calculate = function() {
+  throw new Error('not implemented');
+};
+
+
+function And() {
+  MultipleInputGate.call(this);
+}
+util.inherits(And, MultipleInputGate);
+
+
+And.prototype._calculate = function(inputSignals) {
+  return _.every(inputSignals);
+};
+
+
 module.exports = {
-  InputHigh: function() { return new InputBase(true); },
-  InputLow: function() { return new InputBase(false); },
+  Power: function() { return new Power(); },
+  InputHigh: function(opt_power) {
+    return new InputBase(true, opt_power);
+  },
+  InputLow: function(opt_power) {
+    return new InputBase(false, opt_power);
+  },
   Not: function() { return new Not(); },
+  And: function() { return new And(); },
 };

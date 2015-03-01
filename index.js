@@ -38,6 +38,17 @@ util.inherits(InputBase, Readable);
 InputBase.prototype._read = function() {};
 
 
+function Buf() {
+  Transform.call(this, { objectMode: true });
+}
+util.inherits(Buf, Transform);
+
+Buf.prototype._transform = function(chunk, encoding, next) {
+  this.push(chunk);
+  next();
+};
+
+
 function Not() {
   Transform.call(this, { objectMode: true });
 }
@@ -112,6 +123,7 @@ module.exports = {
   InputLow: function(opt_power) {
     return new InputBase(false, opt_power);
   },
+  Buf: function() { return new Buf(); },
   Not: function() { return new Not(); },
   And: function() { return new And(); },
   Or: function() { return new Or(); },

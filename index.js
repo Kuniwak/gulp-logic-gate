@@ -3,17 +3,19 @@
 var Readable = require('stream').Readable;
 var util = require('util');
 
-function InputHigh() {
+function InputBase(signalLevel) {
   Readable.call(this, { objectMode: true });
+  this._signalLevel = signalLevel;
 }
-util.inherits(InputHigh, Readable);
+util.inherits(InputBase, Readable);
 
-InputHigh.prototype._read = function() {
-  this.push(true);
+InputBase.prototype._read = function() {
+  this.push(this._signalLevel);
   this.push(null);
 };
 
 
 module.exports = {
-  InputHigh: InputHigh,
+  InputHigh: function() { return new InputBase(true); },
+  InputLow: function() { return new InputBase(false); },
 };

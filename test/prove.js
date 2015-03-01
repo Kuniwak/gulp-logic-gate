@@ -18,6 +18,11 @@ Prove.prototype._write = function(chunk, enc, next) {
 };
 
 
+Prove.createLogProve = function(name) {
+  return new Prove(console.log.bind(console, name));
+};
+
+
 Prove.createProve = function(expectedValue, done) {
   return new Prove(function(chunk) {
     expect(chunk).to.equal(expectedValue);

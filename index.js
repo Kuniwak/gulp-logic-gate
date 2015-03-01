@@ -1,6 +1,9 @@
 'use strict';
 
-var Readable = require('stream').Readable;
+var stream = require('stream');
+var Readable = stream.Readable;
+var Transform = stream.Transform;
+
 var util = require('util');
 
 function InputBase(signalLevel) {
@@ -15,7 +18,19 @@ InputBase.prototype._read = function() {
 };
 
 
+function Not() {
+  Transform.call(this, { objectMode: true });
+}
+util.inherits(Not, Transform);
+
+Transform.prototype._transform = function(chunk, encoding, next) {
+  this.push(!chunk);
+  next();
+};
+
+
 module.exports = {
   InputHigh: function() { return new InputBase(true); },
   InputLow: function() { return new InputBase(false); },
+  Not: function() { return new Not(); },
 };

@@ -19,15 +19,14 @@ Power.prototype.turnOn = function() {
   this.emit('poweron');
 };
 
-
-var defaultPower = new Power();
+Power.default = new Power();
 
 
 function InputBase(signalLevel, opt_power) {
   Readable.call(this, { objectMode: true });
 
   var self = this;
-  var power = opt_power || defaultPower;
+  var power = opt_power || Power.default;
   power.on('poweron', function() {
     self.push(signalLevel);
     self.push(null);
@@ -130,8 +129,39 @@ Xor.prototype._calculate = function(inputSignals) {
 };
 
 
+function Clock(life, opt_power) {
+  Readable.call(this, { objectMode: true });
+
+  if (typeof life === 'number' && life <= 0) {
+    throw new Error('life must be positive number, but come: ' + life);
+  }
+
+  this._time = 0;
+  this._life = life * 2; // Because the life is based on high level count
+
+  var power = opt_power || Power.default;
+  power.on('poweron', this._tick.bind(this));
+}
+util.inherits(Clock, Readable);
+
+Clock.prototype._tick = function() {
+  if (this._time >= this._life) {
+    this.push(null);
+    return;
+  }
+
+  this.push(this._time % 2 === 1);
+  this._time++;
+
+  process.nextTick(this._tick.bind(this));
+};
+
+Clock.prototype._read = function() {};
+
+
 module.exports = {
   Power: function() { return new Power(); },
+  Clock: function(life, opt_power) { return new Clock(life, opt_power); },
   InputHigh: function(opt_power) {
     return new InputBase(true, opt_power);
   },

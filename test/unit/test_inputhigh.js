@@ -2,19 +2,14 @@
 
 var expect = require('chai').expect;
 var stream = require('stream');
-var _ = require('lodash');
 
 var logicGate = require('../../index.js');
 var InputHigh = logicGate.InputHigh;
 var Power = logicGate.Power;
-var Prove = require('../prove.js');
+var createProve = require('../prove.js').createProve;
 
 
 describe('InputHigh', function(){
-  function createProve(callback) {
-    return new Prove(callback);
-  }
-
   function createPower() {
     return new Power();
   }
@@ -26,10 +21,7 @@ describe('InputHigh', function(){
 
 
   it('should be read as a true', function(done){
-    var prove = createProve(function(chunk) {
-      expect(chunk).to.be.true;
-      done();
-    });
+    var prove = createProve(true, done);
 
     var power = createPower();
     var high = new InputHigh(power);
@@ -40,31 +32,19 @@ describe('InputHigh', function(){
 
 
   it('should be read as a true always', function(done){
-    var doneMap = { 1: false, 2: false };
-    function doneIfBothDone(id) {
-      doneMap[id] = true;
-      if (_.every(_.values(doneMap))) {
-        done();
-      }
-    }
-
-    var prove1 = createProve(function(chunk) {
-      expect(chunk).to.be.true;
-      doneIfBothDone(1);
-    });
-
-    var prove2 = createProve(function(chunk) {
-      expect(chunk).to.be.true;
-      doneIfBothDone(2);
-    });
-
     var power = createPower();
     var high = new InputHigh(power);
-    high.pipe(prove1);
+
+    Promise.all([
+      new Promise(function(onFulfilled) {
+        high.pipe(createProve(true, onFulfilled));
+      }),
+      new Promise(function(onFulfilled) {
+        high.pipe(createProve(true, onFulfilled));
+      }),
+    ]).then(function() { done(); });
 
     process.nextTick(function() {
-      high.pipe(prove2);
-
       power.turnOn();
     });
   });

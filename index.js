@@ -166,10 +166,10 @@ TimeSeriesInput.prototype._transform = function(chunk, enc, next) {
 };
 
 
-function HazardFilter(steps) {
+function HazardFilter(steps, opt_offset) {
   Transform.call(this, { objectMode: true });
   this._steps = steps;
-  this._cycle = 0;
+  this._cycle = opt_offset || 0;
 }
 util.inherits(HazardFilter, Transform);
 
@@ -200,5 +200,5 @@ module.exports = {
   And: function() { return new And(); },
   Or: function() { return new Or(); },
   Xor: function() { return new Xor(); },
-  HazardFilter: function(step) { return new HazardFilter(step); },
+  HazardFilter: function(step, offset) { return new HazardFilter(step, offset); },
 };

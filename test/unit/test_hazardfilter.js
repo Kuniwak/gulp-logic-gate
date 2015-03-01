@@ -10,6 +10,22 @@ var createSequentialProve = Prove.createSequentialProve;
 
 
 describe('HazardFilter', function(){
+  it('should pick chunks at intervals at 0 step', function(done){
+    var power = new Power();
+    var clock = new Clock(4, power);
+    var inputs = new TimeSeriesInput(function() {
+        return true; // Create [ true, true, true, true ]
+    });
+
+    power.pipe(clock)
+      .pipe(inputs)
+      .pipe(new HazardFilter(0))
+      .pipe(createSequentialProve([ true, true, true, true], done));
+
+    power.turnOn();
+  });
+
+
   it('should pick chunks at intervals at 1 step', function(done){
     var power = new Power();
     var clock = new Clock(4, power);
@@ -25,17 +41,18 @@ describe('HazardFilter', function(){
     power.turnOn();
   });
 
-  it('should pick chunks at intervals at 0 step', function(done){
+
+  it('should pick chunks with offset 1 at intervals at 1 step', function(done){
     var power = new Power();
     var clock = new Clock(4, power);
-    var inputs = new TimeSeriesInput(function() {
-        return true; // Create [ true, true, true, true ]
+    var inputs = new TimeSeriesInput(function(time) {
+        return time % 2 > 0; // Create [ false, true, false, true ]
     });
 
     power.pipe(clock)
       .pipe(inputs)
-      .pipe(new HazardFilter(0))
-      .pipe(createSequentialProve([ true, true, true, true], done));
+      .pipe(new HazardFilter(1, 1))
+      .pipe(createSequentialProve([ true, true ], done));
 
     power.turnOn();
   });

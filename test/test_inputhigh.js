@@ -4,7 +4,9 @@ var expect = require('chai').expect;
 var stream = require('stream');
 var _ = require('lodash');
 
-var InputHigh = require('../index.js').InputHigh;
+var logicGate = require('../index.js');
+var InputHigh = logicGate.InputHigh;
+var Power = logicGate.Power;
 var Prove = require('./prove.js');
 
 
@@ -13,15 +15,13 @@ describe('InputHigh', function(){
     return new Prove(callback);
   }
 
+  function createPower() {
+    return new Power();
+  }
+
   it('should be a readable stream', function(){
     var high = new InputHigh();
     expect(high).to.be.instanceof(stream.Readable);
-  });
-
-
-  it('should return a true', function(){
-    var high = new InputHigh();
-    expect(high.read()).to.be.true;
   });
 
 
@@ -31,8 +31,11 @@ describe('InputHigh', function(){
       done();
     });
 
-    var high = new InputHigh();
+    var power = createPower();
+    var high = new InputHigh(power);
     high.pipe(prove);
+
+    power.turnOn();
   });
 
 
@@ -55,8 +58,14 @@ describe('InputHigh', function(){
       doneIfBothDone(2);
     });
 
-    var high = new InputHigh();
+    var power = createPower();
+    var high = new InputHigh(power);
     high.pipe(prove1);
-    high.pipe(prove2);
+
+    process.nextTick(function() {
+      high.pipe(prove2);
+
+      power.turnOn();
+    });
   });
 });

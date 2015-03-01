@@ -25,6 +25,7 @@
     "mocha": "^2.1.0"
   },
   "dependencies": {
+    "hashmap": "^2.0.1",
     "lodash": "^3.3.1"
   }
 }

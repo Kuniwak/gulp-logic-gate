@@ -43,7 +43,7 @@ function Not() {
 }
 util.inherits(Not, Transform);
 
-Transform.prototype._transform = function(chunk, encoding, next) {
+Not.prototype._transform = function(chunk, encoding, next) {
   this.push(!chunk);
   next();
 };

@@ -159,15 +159,28 @@ Clock.prototype._tick = function() {
 Clock.prototype._read = function() {};
 
 
+function TimeSeriesInput(generator) {
+  Transform.call(this, { objectMode: true });
+  this._gen = generator;
+}
+util.inherits(TimeSeriesInput, Transform);
+
+TimeSeriesInput.prototype._transform = function(chunk, enc, next) {
+  this.push(this._gen(chunk));
+  next();
+};
+
+
 module.exports = {
   Power: function() { return new Power(); },
-  Clock: function(life, opt_power) { return new Clock(life, opt_power); },
   InputHigh: function(opt_power) {
     return new InputBase(true, opt_power);
   },
   InputLow: function(opt_power) {
     return new InputBase(false, opt_power);
   },
+  Clock: function(life, opt_power) { return new Clock(life, opt_power); },
+  TimeSeriesInput: function(generator) { return new TimeSeriesInput(generator); },
   Buf: function() { return new Buf(); },
   Not: function() { return new Not(); },
   And: function() { return new And(); },

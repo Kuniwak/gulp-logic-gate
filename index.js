@@ -166,6 +166,25 @@ TimeSeriesInput.prototype._transform = function(chunk, enc, next) {
 };
 
 
+function HazardFilter(steps) {
+  Transform.call(this, { objectMode: true });
+  this._steps = steps;
+  this._cycle = 0;
+}
+util.inherits(HazardFilter, Transform);
+
+HazardFilter.prototype._transform = function(chunk, enc, next) {
+  if (this._cycle <= 0) {
+    this.push(chunk);
+    this._cycle = this._steps;
+  }
+  else {
+    this._cycle--;
+  }
+  next();
+};
+
+
 module.exports = {
   Power: function() { return new Power(); },
   InputHigh: function(opt_power) {
@@ -181,4 +200,5 @@ module.exports = {
   And: function() { return new And(); },
   Or: function() { return new Or(); },
   Xor: function() { return new Xor(); },
+  HazardFilter: function(step) { return new HazardFilter(step); },
 };

@@ -1,6 +1,5 @@
 'use strict';
 
-var through2 = require('through2');
 var Prove = require('../prove.js');
 var createProve = Prove.createProve;
 var createSequentialProve = Prove.createSequentialProve;
@@ -15,6 +14,7 @@ var And = logicGate.And;
 var Or = logicGate.Or;
 var Not = logicGate.Not;
 var Buf = logicGate.Buf;
+var HazardFilter = logicGate.HazardFilter;
 
 describe('Stateless combinational logic circuits', function(){
   describe('Half adder', function(){
@@ -142,34 +142,25 @@ describe('Stateless combinational logic circuits', function(){
     it('should be read as a time series LLLH when given LHLH and LLHH', function(done){
       var power = new Power();
       var clock = new Clock(4, power);
-      power.pipe(clock);
 
       var inputs1 = new TimeSeriesInput(function(time) {
-        return time % 4 > 1;
+        return time % 4 > 1; // Create [ false, false, true, true ]
       });
-      clock.pipe(inputs1);
       var inputs2 = new TimeSeriesInput(function(time) {
-        return time % 2 > 0;
+        return time % 2 > 0; // Create [ false, true, false, true ]
       });
-      clock.pipe(inputs2);
 
       var and = new And();
-      inputs1.pipe(and);
-      inputs2.pipe(and);
 
-      var flip = true;
-      var noiseFilter = through2.obj(function(chunk, enc, next) {
-        if (flip) {
-          next(null, chunk);
-        }
-        else {
-          next();
-        }
-        flip = !flip;
-      });
+      power.pipe(clock);
+      clock.pipe(inputs1).pipe(and);
+      clock.pipe(inputs2).pipe(and);
 
       var prove = createSequentialProve([false, false, false, true], done);
-      and.pipe(noiseFilter).pipe(prove);
+
+      // The output has hazards at intervals of 1 clock.
+      // In this example, [ false, HAZARD, false, HAZARD, false, HAZARD, true ].
+      and.pipe(new HazardFilter(1)).pipe(prove);
 
       power.turnOn();
     });

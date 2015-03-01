@@ -93,6 +93,17 @@ And.prototype._calculate = function(inputSignals) {
 };
 
 
+function Or() {
+  MultipleInputGate.call(this);
+}
+util.inherits(Or, MultipleInputGate);
+
+
+Or.prototype._calculate = function(inputSignals) {
+  return _.some(inputSignals);
+};
+
+
 module.exports = {
   Power: function() { return new Power(); },
   InputHigh: function(opt_power) {
@@ -103,4 +114,5 @@ module.exports = {
   },
   Not: function() { return new Not(); },
   And: function() { return new And(); },
+  Or: function() { return new Or(); },
 };

@@ -18,7 +18,7 @@ describe('Not', function(){
     expect(not).to.be.instanceof(stream.Transform);
   });
 
-  it('should read as a true when piped an input high', function(done){
+  it('should read as a false when piped an input high', function(done){
     var prove = new Prove(function(chunk) {
       expect(chunk).to.be.false;
       done();

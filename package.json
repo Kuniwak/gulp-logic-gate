@@ -1,0 +1,27 @@
+{
+  "name": "gulp-logic-gate",
+  "version": "0.0.0",
+  "description": "Logic gates providing Turing completeness for gulp",
+  "main": "index.js",
+  "scripts": {
+    "test": "$(npm bin)/mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Kuniwak/gulp-logic-gates"
+  },
+  "keywords": [
+    "gulpplugin",
+    "joke"
+  ],
+  "author": "Kuniwak",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Kuniwak/gulp-logic-gates/issues"
+  },
+  "homepage": "https://github.com/Kuniwak/gulp-logic-gates",
+  "devDependencies": {
+    "chai": "^2.1.0",
+    "mocha": "^2.1.0"
+  }
+}

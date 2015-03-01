@@ -115,6 +115,21 @@ Or.prototype._calculate = function(inputSignals) {
 };
 
 
+function Xor() {
+  MultipleInputGate.call(this);
+}
+util.inherits(Xor, MultipleInputGate);
+
+
+Xor.prototype._calculate = function(inputSignals) {
+  var highCount = _.filter(inputSignals, function(signal) {
+    return signal;
+  }).length;
+
+  return highCount % 2 === 1;
+};
+
+
 module.exports = {
   Power: function() { return new Power(); },
   InputHigh: function(opt_power) {
@@ -127,4 +142,5 @@ module.exports = {
   Not: function() { return new Not(); },
   And: function() { return new And(); },
   Or: function() { return new Or(); },
+  Xor: function() { return new Xor(); },
 };

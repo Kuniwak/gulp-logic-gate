@@ -185,6 +185,25 @@ HazardFilter.prototype._transform = function(chunk, enc, next) {
 };
 
 
+function EdgeTrigger() {
+  Transform.call(this, { objectMode: true });
+  this._empty = true;
+  this._prevState = null;
+}
+util.inherits(EdgeTrigger, Transform);
+
+EdgeTrigger.prototype._transform = function(chunk, enc, next) {
+  if (!this._empty && this._prevState === chunk) {
+    next();
+    return;
+  }
+
+  next(null, chunk);
+  this._empty = false;
+  this._prevState = chunk;
+};
+
+
 module.exports = {
   Power: function() { return new Power(); },
   InputHigh: function(opt_power) {
@@ -201,4 +220,5 @@ module.exports = {
   Or: function() { return new Or(); },
   Xor: function() { return new Xor(); },
   HazardFilter: function(step, offset) { return new HazardFilter(step, offset); },
+  EdgeTrigger: function() { return new EdgeTrigger(); },
 };

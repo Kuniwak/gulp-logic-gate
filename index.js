@@ -137,7 +137,7 @@ function Clock(life, opt_power) {
   }
 
   this._time = 0;
-  this._life = life * 2; // Because the life is based on high level count
+  this._life = life;
 
   var power = opt_power || Power.default;
   power.on('poweron', this._tick.bind(this));
@@ -150,7 +150,7 @@ Clock.prototype._tick = function() {
     return;
   }
 
-  this.push(this._time % 2 === 1);
+  this.push(this._time);
   this._time++;
 
   process.nextTick(this._tick.bind(this));

@@ -6,7 +6,7 @@ var stream = require('stream');
 var logicGate = require('../../index.js');
 var Power = logicGate.Power;
 var Clock = logicGate.Clock;
-var Prove = require('../prove.js');
+var createSequentialProve = require('../prove.js').createSequentialProve;
 
 
 describe('Clock', function(){
@@ -16,23 +16,11 @@ describe('Clock', function(){
   });
 
 
-  function createSequentialProve(expectedOuputs, done) {
-    return new Prove(function(chunk) {
-      var expectedOuput = expectedOuputs.shift();
-      expect(chunk).to.equal(expectedOuput);
-
-      if (expectedOuputs.length <= 0) {
-        done();
-      }
-    });
-  }
-
-
   it('should be read as a time series LH when given 1 as the life times', function(done){
     var power = new Power();
     var clock = new Clock(1, power);
 
-    var prove = createSequentialProve([false, true], done);
+    var prove = createSequentialProve([0], done);
     clock.pipe(prove);
 
     power.turnOn();
@@ -41,9 +29,9 @@ describe('Clock', function(){
 
   it('should be read as a time series LHLH when given 2 as the life times', function(done){
     var power = new Power();
-    var clock = new Clock(2, power);
+    var clock = new Clock(5, power);
 
-    var prove = createSequentialProve([false, true, false, true], done);
+    var prove = createSequentialProve([0, 1, 2, 3, 4], done);
     clock.pipe(prove);
 
     power.turnOn();

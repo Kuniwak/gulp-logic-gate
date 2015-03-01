@@ -26,4 +26,16 @@ Prove.createProve = function(expectedValue, done) {
 };
 
 
+Prove.createSequentialProve = function(expectedOuputs, done) {
+  return new Prove(function(chunk) {
+    var expectedOuput = expectedOuputs.shift();
+    expect(chunk).to.equal(expectedOuput);
+
+    if (expectedOuputs.length <= 0) {
+      done();
+    }
+  });
+};
+
+
 module.exports = Prove;

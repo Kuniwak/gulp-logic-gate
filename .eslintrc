@@ -5,6 +5,7 @@
   "rules": {
     "quotes": [ 2, "single" ],
     "no-comma-dangle": 0,
-    "no-underscore-dangle": 0
+    "no-underscore-dangle": 0,
+    "camelcase": 0
   }
 }

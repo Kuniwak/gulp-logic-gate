@@ -4,6 +4,7 @@ var expect = require('chai').expect;
 var stream = require('stream');
 
 var logicGate = require('../index.js');
+var Power = logicGate.Power;
 var Not = logicGate.Not;
 var InputHigh = logicGate.InputHigh;
 var InputLow = logicGate.InputLow;
@@ -23,9 +24,12 @@ describe('Not', function(){
       done();
     });
 
-    var high = new InputHigh();
+    var power = new Power();
+    var high = new InputHigh(power);
     var not = new Not();
     high.pipe(not).pipe(prove);
+
+    power.turnOn();
   });
 
   it('should read as a true when piped an input low', function(done){
@@ -34,8 +38,11 @@ describe('Not', function(){
       done();
     });
 
-    var low = new InputLow();
+    var power = new Power();
+    var low = new InputLow(power);
     var not = new Not();
     low.pipe(not).pipe(prove);
+
+    power.turnOn();
   });
 });

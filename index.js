@@ -1,21 +1,41 @@
 'use strict';
 
 var stream = require('stream');
+var EventEmitter = require('events').EventEmitter;
 var Readable = stream.Readable;
 var Transform = stream.Transform;
 
 var util = require('util');
+var _ = require('lodash');
+var HashMap = require('hashmap');
 
-function InputBase(signalLevel) {
+
+function Power() {
+  EventEmitter.call(this);
+}
+util.inherits(Power, EventEmitter);
+
+Power.prototype.turnOn = function() {
+  this.emit('poweron');
+};
+
+
+var defaultPower = new Power();
+
+
+function InputBase(signalLevel, opt_power) {
   Readable.call(this, { objectMode: true });
-  this._signalLevel = signalLevel;
+
+  var self = this;
+  var power = opt_power || defaultPower;
+  power.on('poweron', function() {
+    self.push(signalLevel);
+    self.push(null);
+  });
 }
 util.inherits(InputBase, Readable);
 
-InputBase.prototype._read = function() {
-  this.push(this._signalLevel);
-  this.push(null);
-};
+InputBase.prototype._read = function() {};
 
 
 function Not() {

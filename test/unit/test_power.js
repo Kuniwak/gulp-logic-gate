@@ -1,20 +1,15 @@
 'use strict';
 
-var expect = require('chai').expect;
-
 var logicGate = require('../../index.js');
 var Power = logicGate.Power;
+var createProve = require('../prove.js').createProve;
 
 describe('Power', function(){
-  it('should fire an event "poweron" when turnOn called', function(done){
+  it('should read a true when turnOn was invoked', function(done){
     var power = new Power();
+    var prove = createProve(true, done);
 
-    power.on('poweron', function() {
-      var called = true;
-      expect(called).to.be.true;
-      done();
-    });
-
+    power.pipe(prove);
     power.turnOn();
   });
 });

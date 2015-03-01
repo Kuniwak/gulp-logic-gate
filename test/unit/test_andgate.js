@@ -1,35 +1,20 @@
 'use strict';
 
-var expect = require('chai').expect;
-var stream = require('stream');
-
 var logicGate = require('../../index.js');
 var Power = logicGate.Power;
 var And = logicGate.And;
 var InputHigh = logicGate.InputHigh;
 var InputLow = logicGate.InputLow;
 
-var Prove = require('../prove.js');
+var createProve = require('../prove.js').createProve;
 
 
 describe('And', function(){
-  function createProve(expectedValue, done) {
-    return new Prove(function(chunk) {
-      expect(chunk).to.equal(expectedValue);
-      done();
-    });
-  }
-
-  it('should be a transform stream', function(){
-    var and = new And();
-    expect(and).to.be.instanceof(stream.Transform);
-  });
-
   it('should read as a true when piped a high input', function(done){
     var prove = createProve(true, done);
 
     var power = new Power();
-    var high = new InputHigh(power);
+    var high = power.pipe(new InputHigh());
 
     var and = new And();
     high.pipe(and).pipe(prove);
@@ -42,9 +27,9 @@ describe('And', function(){
     var prove = createProve(true, done);
 
     var power = new Power();
-    var high1 = new InputHigh(power);
-    var high2 = new InputHigh(power);
-    var high3 = new InputHigh(power);
+    var high1 = power.pipe(new InputHigh());
+    var high2 = power.pipe(new InputHigh());
+    var high3 = power.pipe(new InputHigh());
 
     var and = new And();
     high1.pipe(and);
@@ -61,7 +46,7 @@ describe('And', function(){
     var prove = createProve(false, done);
 
     var power = new Power();
-    var low = new InputLow(power);
+    var low = power.pipe(new InputLow());
 
     var and = new And();
     low.pipe(and).pipe(prove);
@@ -74,9 +59,9 @@ describe('And', function(){
     var prove = createProve(false, done);
 
     var power = new Power();
-    var high1 = new InputHigh(power);
-    var high2 = new InputHigh(power);
-    var low = new InputLow(power);
+    var high1 = power.pipe(new InputHigh());
+    var high2 = power.pipe(new InputHigh());
+    var low = power.pipe(new InputLow());
 
     var and = new And();
     high1.pipe(and);
@@ -93,8 +78,8 @@ describe('And', function(){
 
 
     var power = new Power();
-    var high = new InputHigh(power);
-    var low = new InputLow(power);
+    var high = power.pipe(new InputHigh());
+    var low = power.pipe(new InputLow());
 
     var and = new And();
     high.pipe(and);

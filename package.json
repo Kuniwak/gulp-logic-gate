@@ -22,9 +22,11 @@
   "homepage": "https://github.com/Kuniwak/gulp-logic-gates",
   "devDependencies": {
     "chai": "^2.1.0",
-    "mocha": "^2.1.0"
+    "mocha": "^2.1.0",
+    "through2": "^0.6.3"
   },
   "dependencies": {
-    "hashmap": "^2.0.1"
+    "hashmap": "^2.0.1",
+    "lodash": "^3.3.1"
   }
 }

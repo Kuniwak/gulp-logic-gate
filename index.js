@@ -1,7 +1,6 @@
 'use strict';
 
 var stream = require('stream');
-var EventEmitter = require('events').EventEmitter;
 var Readable = stream.Readable;
 var Transform = stream.Transform;
 
@@ -11,30 +10,27 @@ var HashMap = require('hashmap');
 
 
 function Power() {
-  EventEmitter.call(this);
+  Readable.call(this, { objectMode: true });
 }
-util.inherits(Power, EventEmitter);
+util.inherits(Power, Readable);
+
+Power.prototype._read = function() {};
 
 Power.prototype.turnOn = function() {
-  this.emit('poweron');
+  this.push(true);
 };
 
-Power.default = new Power();
 
-
-function InputBase(signalLevel, opt_power) {
-  Readable.call(this, { objectMode: true });
-
-  var self = this;
-  var power = opt_power || Power.default;
-  power.on('poweron', function() {
-    self.push(signalLevel);
-    self.push(null);
-  });
+function InputBase(signalLevel) {
+  Transform.call(this, { objectMode: true });
+  this._signalLevel = signalLevel;
 }
-util.inherits(InputBase, Readable);
+util.inherits(InputBase, Transform);
 
-InputBase.prototype._read = function() {};
+InputBase.prototype._transform = function(chunk, enc, next) {
+  this.push(this._signalLevel);
+  next();
+};
 
 
 function Buf() {
@@ -86,7 +82,7 @@ function MultipleInputGate() {
 }
 util.inherits(MultipleInputGate, Transform);
 
-MultipleInputGate.prototype._transform = function() {};
+MultipleInputGate.prototype._transform = function(chunk, enc, next) { next(); };
 MultipleInputGate.prototype._calculate = function() {
   throw new Error('not implemented');
 };
@@ -129,8 +125,8 @@ Xor.prototype._calculate = function(inputSignals) {
 };
 
 
-function Clock(life, opt_power) {
-  Readable.call(this, { objectMode: true });
+function Clock(life) {
+  Transform.call(this, { objectMode: true });
 
   if (typeof life === 'number' && life <= 0) {
     throw new Error('life must be positive number, but come: ' + life);
@@ -138,15 +134,11 @@ function Clock(life, opt_power) {
 
   this._time = 0;
   this._life = life;
-
-  var power = opt_power || Power.default;
-  power.on('poweron', this._tick.bind(this));
 }
-util.inherits(Clock, Readable);
+util.inherits(Clock, Transform);
 
 Clock.prototype._tick = function() {
   if (this._time >= this._life) {
-    this.push(null);
     return;
   }
 
@@ -156,7 +148,10 @@ Clock.prototype._tick = function() {
   process.nextTick(this._tick.bind(this));
 };
 
-Clock.prototype._read = function() {};
+Clock.prototype._transform = function(chunk, enc, next) {
+  this._tick();
+  next();
+};
 
 
 function TimeSeriesInput(generator) {

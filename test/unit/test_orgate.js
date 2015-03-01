@@ -1,35 +1,20 @@
 'use strict';
 
-var expect = require('chai').expect;
-var stream = require('stream');
-
 var logicGate = require('../../index.js');
 var Power = logicGate.Power;
 var Or = logicGate.Or;
 var InputHigh = logicGate.InputHigh;
 var InputLow = logicGate.InputLow;
 
-var Prove = require('../prove.js');
+var createProve = require('../prove.js').createProve;
 
 
 describe('Or', function(){
-  function createProve(expectedValue, done) {
-    return new Prove(function(chunk) {
-      expect(chunk).to.equal(expectedValue);
-      done();
-    });
-  }
-
-  it('should be a transform stream', function(){
-    var or = new Or();
-    expect(or).to.be.instanceof(stream.Transform);
-  });
-
   it('should read as a true when piped a high input', function(done){
     var prove = createProve(true, done);
 
     var power = new Power();
-    var high = new InputHigh(power);
+    var high = power.pipe(new InputHigh());
 
     var or = new Or();
     high.pipe(or).pipe(prove);
@@ -42,9 +27,9 @@ describe('Or', function(){
     var prove = createProve(false, done);
 
     var power = new Power();
-    var low1 = new InputLow(power);
-    var low2 = new InputLow(power);
-    var low3 = new InputLow(power);
+    var low1 = power.pipe(new InputLow());
+    var low2 = power.pipe(new InputLow());
+    var low3 = power.pipe(new InputLow());
 
     var or = new Or();
     low1.pipe(or);
@@ -61,7 +46,7 @@ describe('Or', function(){
     var prove = createProve(false, done);
 
     var power = new Power();
-    var low = new InputLow(power);
+    var low = power.pipe(new InputLow());
 
     var or = new Or();
     low.pipe(or).pipe(prove);
@@ -71,16 +56,15 @@ describe('Or', function(){
 
 
   it('should read as a true when piped several high inputs and several low inputs', function(done){
-    var prove = createProve(true, done);
-
     var power = new Power();
-    var high = new InputHigh(power);
-    var low = new InputLow(power);
+    var high = power.pipe(new InputHigh());
+    var low = power.pipe(new InputLow());
 
     var or = new Or();
     high.pipe(or);
     low.pipe(or);
 
+    var prove = createProve(true, done);
     or.pipe(prove);
 
     power.turnOn();
@@ -88,11 +72,9 @@ describe('Or', function(){
 
 
   it('should read as a false when both low and high inputs are piped and the high input are only unpiped', function(done){
-
-
     var power = new Power();
-    var high = new InputHigh(power);
-    var low = new InputLow(power);
+    var high = power.pipe(new InputHigh());
+    var low = power.pipe(new InputLow());
 
     var or = new Or();
     high.pipe(or);

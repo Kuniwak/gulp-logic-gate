@@ -1,8 +1,5 @@
 'use strict';
 
-var expect = require('chai').expect;
-var stream = require('stream');
-
 var logicGate = require('../../index.js');
 var InputHigh = logicGate.InputHigh;
 var Power = logicGate.Power;
@@ -10,21 +7,12 @@ var createProve = require('../prove.js').createProve;
 
 
 describe('InputHigh', function(){
-  function createPower() {
-    return new Power();
-  }
-
-  it('should be a readable stream', function(){
-    var high = new InputHigh();
-    expect(high).to.be.instanceof(stream.Readable);
-  });
-
-
   it('should be read as a true', function(done){
-    var prove = createProve(true, done);
+    var power = new Power();
+    var high = new InputHigh();
+    power.pipe(high);
 
-    var power = createPower();
-    var high = new InputHigh(power);
+    var prove = createProve(true, done);
     high.pipe(prove);
 
     power.turnOn();
@@ -32,8 +20,9 @@ describe('InputHigh', function(){
 
 
   it('should be read as a true always', function(done){
-    var power = createPower();
-    var high = new InputHigh(power);
+    var power = new Power();
+    var high = new InputHigh();
+    power.pipe(high);
 
     Promise.all([
       new Promise(function(onFulfilled) {
@@ -44,8 +33,6 @@ describe('InputHigh', function(){
       }),
     ]).then(function() { done(); });
 
-    process.nextTick(function() {
-      power.turnOn();
-    });
+    power.turnOn();
   });
 });

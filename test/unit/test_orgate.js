@@ -3,13 +3,13 @@
 var expect = require('chai').expect;
 var stream = require('stream');
 
-var logicGate = require('../index.js');
+var logicGate = require('../../index.js');
 var Power = logicGate.Power;
 var Or = logicGate.Or;
 var InputHigh = logicGate.InputHigh;
 var InputLow = logicGate.InputLow;
 
-var Prove = require('./prove.js');
+var Prove = require('../prove.js');
 
 
 describe('Or', function(){

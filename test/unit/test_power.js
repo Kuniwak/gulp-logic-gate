@@ -2,7 +2,7 @@
 
 var expect = require('chai').expect;
 
-var logicGate = require('../index.js');
+var logicGate = require('../../index.js');
 var Power = logicGate.Power;
 
 describe('Power', function(){

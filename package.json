@@ -4,7 +4,7 @@
   "description": "Logic gates providing Turing completeness for gulp",
   "main": "index.js",
   "scripts": {
-    "test": "$(npm bin)/mocha"
+    "test": "$(npm bin)/mocha test/**/test_*.js"
   },
   "repository": {
     "type": "git",

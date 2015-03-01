@@ -4,10 +4,10 @@ var expect = require('chai').expect;
 var stream = require('stream');
 var _ = require('lodash');
 
-var logicGate = require('../index.js');
+var logicGate = require('../../index.js');
 var InputLow = logicGate.InputLow;
 var Power = logicGate.Power;
-var Prove = require('./prove.js');
+var Prove = require('../prove.js');
 
 
 describe('InputLow', function(){
